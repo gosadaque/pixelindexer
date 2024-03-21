@@ -99,7 +99,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
     let seite = parseInt(params.get('seiten')) || 1;
-    const eintraegeProSeite = 50;
+    const eintraegeProSeite = 32;
     let aktuellerFilter = params.get('filter') || '';
 
     function loadPage(pageNumber) {
