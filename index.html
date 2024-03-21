@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+	<meta name="juicyads-site-verification" content="c6a8d8e0d1efaa076016c23e3a5e240b">
+    <title>Pixelindexer</title>
+    <style>
+        body, html {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #161a26;
+			color: #c2c6d0;
+        }
+
+        #container {
+            margin: 20px;
+			display: flex; /* Aktiviert Flexbox */
+            justify-content: center; /* Zentriert die Elemente horizontal */
+            align-items: flex-start; /* Verhindert, dass Elemente in der Höhe gestreckt werden */
+        }
+
+
+        #dataTable {
+            /* Optional: Styling für die Tabelle */
+            margin-right: 20px; /* Fügt einen rechten Abstand zur Tabelle hinzu */
+        }
+		
+		a {
+		  color: #c50dd2;
+		}
+
+        table {
+            width: 75%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #c2c6d0;
+        }
+
+        th {
+            background-color: #c50dd2;
+            color: white;
+        }
+		
+    </style>
+</head>
+<body>
+    <div id="container">
+		<select id="fileTypeFilter">
+            <option value="">All Data Types</option>
+            <option value="application/vnd.microsoft.portable-executable">executable</option>
+            <option value="application/x-7z-compressed">application/x-7z-compressed</option>
+        </select>
+        <button id="applyFilter">Filter</button><br/><!-- JuicyAds v3.0 -->
+		<script type="text/javascript" data-cfasync="false" async src="https://poweredby.jads.co/js/jads.js"></script>
+		<ins id="1051390" data-width="258" data-height="58"></ins>
+		<script type="text/javascript" data-cfasync="false" async>(adsbyjuicy = window.adsbyjuicy || []).push({'adzone':1051390});</script>
+		<!--JuicyAds END-->
+		<br/>
+		<!-- JuicyAds v3.0 -->
+		<script type="text/javascript" data-cfasync="false" async src="https://poweredby.jads.co/js/jads.js"></script>
+		<ins id="1051389" data-width="728" data-height="102"></ins>
+		<script type="text/javascript" data-cfasync="false" async>(adsbyjuicy = window.adsbyjuicy || []).push({'adzone':1051389});</script>
+		<!--JuicyAds END-->
+	</div>
+	<div id="container">
+        <table id="dataTable">
+			<thead>
+				<tr>
+					<th>File Name</th>
+					<th>Data Type</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!-- Hier werden die Datenzeilen eingefügt -->
+			</tbody>
+		</table>
+		
+		<!-- JuicyAds v3.0 -->
+		<script type="text/javascript" data-cfasync="false" async src="https://poweredby.jads.co/js/jads.js"></script>
+		<ins id="1051393" data-width="168" data-height="1228"></ins>
+		<script type="text/javascript" data-cfasync="false" async>(adsbyjuicy = window.adsbyjuicy || []).push({'adzone':1051393});</script>
+		<!--JuicyAds END-->
+	</div>
+	<div id="container">
+		<div id="pagination">
+			<button id="prevPage"><</button>
+			<span id="pageIndicator"></span>
+			<button id="nextPage">></button>
+		</div>
+	    
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    let seite = parseInt(params.get('seiten')) || 1;
+    const eintraegeProSeite = 50;
+    let aktuellerFilter = params.get('filter') || '';
+
+    function loadPage(pageNumber) {
+        const filterParam = aktuellerFilter ? `&filter=${aktuellerFilter}` : '';
+        window.location.search = `?seiten=${pageNumber}${filterParam}`;
+    }
+
+    function updatePageIndicator() {
+        document.getElementById('pageIndicator').textContent = `Seite ${seite}`;
+    }
+
+    function applyFilter() {
+        aktuellerFilter = document.getElementById('fileTypeFilter').value;
+        loadPage(1); // Zurück zu Seite 1, wenn ein neuer Filter angewendet wird
+    }
+
+    function fillDropdown(uniqueTypes) {
+        const dropdown = document.getElementById('fileTypeFilter');
+        dropdown.innerHTML = '<option value="">All Data Types</option>';
+        uniqueTypes.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.textContent = type;
+            dropdown.appendChild(option);
+        });
+    }
+
+    fetch('data.csv')
+        .then(response => response.text())
+        .then(text => {
+            const data = parseCSV(text);
+            // Einzigartige MIME-Typen extrahieren
+            const uniqueTypes = Array.from(new Set(data.map(row => row[2]))).sort();
+            fillDropdown(uniqueTypes);
+            const filteredData = aktuellerFilter ? data.filter(row => row[2] === aktuellerFilter) : data;
+            const paginatedData = filteredData.slice((seite - 1) * eintraegeProSeite, seite * eintraegeProSeite);
+            fillTable(paginatedData);
+            updatePageIndicator();
+            // Setze den Dropdown-Wert auf den aktuellen Filter, falls vorhanden
+            if (aktuellerFilter) {
+                document.getElementById('fileTypeFilter').value = aktuellerFilter;
+            }
+        })
+        .catch(error => console.error('Fehler beim Laden der CSV-Datei:', error));
+
+    document.getElementById('applyFilter').addEventListener('click', applyFilter);
+    document.getElementById('prevPage').addEventListener('click', function() { if (seite > 1) { loadPage(--seite); } });
+    document.getElementById('nextPage').addEventListener('click', function() { loadPage(++seite); });
+});
+
+function parseCSV(text) {
+    return text.trim().split('\n').map(row => row.slice(1, -1).split('","').map(value => value.replace(/"$/, '')));
+}
+
+function fillTable(data) {
+    const tableBody = document.querySelector('#dataTable tbody');
+    tableBody.innerHTML = '';
+    data.forEach(row => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td');
+        const link = document.createElement('a');
+        link.href = `https://pixeldrain.com/u/${row[0]}`;
+        link.textContent = row[1];
+        link.target = "_blank";
+        tdName.appendChild(link);
+        const tdType = document.createElement('td');
+        tdType.textContent = row[2];
+        tr.appendChild(tdName);
+        tr.appendChild(tdType);
+        tableBody.appendChild(tr);
+    });
+}
+</script>
+
+	<!-- Clickunder.de Werbemittelcode -->
+	<script type="application/javascript">
+		/* <![CDATA[ */
+		var date = new Date();
+		document.write('<script type="application/javascript" src="//www.clickunder.de/werbemittel/clickunder/deliver.php?phw_id=593&_noCache=' + date.getMilliseconds() + '&"><\/script>');
+		/* ]]> */
+	</script>
+	<!-- /Clickunder.de Werbemittelcode -->
+</body>
+</html>
+	
