@@ -98,13 +98,13 @@
     <script>
 document.addEventListener('DOMContentLoaded', function() {
     const params = new URLSearchParams(window.location.search);
-    let seite = parseInt(params.get('seiten')) || 1;
+    let seite = parseInt(params.get('p')) || 1;
     const eintraegeProSeite = 32;
     let aktuellerFilter = params.get('filter') || '';
 
     function loadPage(pageNumber) {
         const filterParam = aktuellerFilter ? `&filter=${aktuellerFilter}` : '';
-        window.location.search = `?seiten=${pageNumber}${filterParam}`;
+        window.location.search = `?p=${pageNumber}${filterParam}`;
     }
 
     function updatePageIndicator() {
